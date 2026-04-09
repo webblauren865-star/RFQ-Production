@@ -1,57 +1,74 @@
 
 import streamlit as st
 
-# Define stages with department responsibility and colors
-stages = [
-    {"stage": "RFQ / Customer Inquiry Received", "department": "Customer Success", "color": "#FFD700"},
-    {"stage": "Feasibility Assessment", "department": "Technical Services / Quality / Operations", "color": "#87CEEB"},
-    {"stage": "Quote Preparation", "department": "Customer Success / Technical Services / Operations / Quality", "color": "#32CD32"},
-    {"stage": "Quote Sent", "department": "Customer Success", "color": "#FFD700"},
-    {"stage": "Customer Decision", "department": "Customer Success", "color": "#FFD700"},
-    {"stage": "Project Kickoff & Setup", "department": "Customer Success", "color": "#FFD700"},
-    {"stage": "Project Plan & Packaging Plan", "department": "Customer Success / Technical Services / Quality / Operations", "color": "#32CD32"},
-    {"stage": "GMP Document Creation", "department": "Technical Services / Quality / Operations", "color": "#87CEEB"},
-    {"stage": "Equipment OQ & Line Trial", "department": "Technical Services / Operations / Quality", "color": "#87CEEB"},
-    {"stage": "PQ Batch (GMP Run)", "department": "Operations / Technical Services / Quality", "color": "#FFA07A"},
-    {"stage": "Commercial Release & Routine Production", "department": "Customer Success / Operations / Quality", "color": "#32CD32"},
-    {"stage": "Ongoing Account Management", "department": "Customer Success", "color": "#FFD700"}
-]
-
-# Initialize session state
-if "current_stage" not in st.session_state:
-    st.session_state.current_stage = 0
-
-# Dashboard title
+# Page setup
+st.set_page_config(page_title="Customer Project Dashboard", layout="wide")
 st.title("📊 Customer Project Dashboard")
+st.header("Project Workflow by Department")
 
-# Buttons to control progress
-col1, col2 = st.columns([1,1])
-with col1:
-    if st.button("Advance Stage"):
-        if st.session_state.current_stage < len(stages) - 1:
-            st.session_state.current_stage += 1
-with col2:
-    if st.button("Reset Progress"):
-        st.session_state.current_stage = 0
+# Departments, workflow steps, and colors
+departments = {
+    "Customer Success": {
+        "steps": [
+            "RFQ / Customer Inquiry Received",
+            "Quote Preparation",
+            "Quote Sent",
+            "Customer Decision",
+            "Project Kickoff & Setup",
+            "Project Plan & Packaging Plan",
+            "Commercial Release & Routine Production",
+            "Ongoing Account Management"
+        ],
+        "color": "#FFB347"  # orange
+    },
+    "Technical Services": {
+        "steps": [
+            "Feasibility Assessment",
+            "Quote Preparation",
+            "Project Plan & Packaging Plan",
+            "GMP Document Creation",
+            "Equipment OQ & Line Trial",
+            "PQ Batch (GMP Run)"
+        ],
+        "color": "#85C1E9"  # blue
+    },
+    "Operations": {
+        "steps": [
+            "Feasibility Assessment",
+            "Quote Preparation",
+            "Project Plan & Packaging Plan",
+            "GMP Document Creation",
+            "Equipment OQ & Line Trial",
+            "PQ Batch (GMP Run)",
+            "Commercial Release & Routine Production"
+        ],
+        "color": "#82E0AA"  # green
+    },
+    "Quality": {
+        "steps": [
+            "Feasibility Assessment",
+            "Quote Preparation",
+            "Project Plan & Packaging Plan",
+            "GMP Document Creation",
+            "Equipment OQ & Line Trial",
+            "PQ Batch (GMP Run)",
+            "Commercial Release & Routine Production"
+        ],
+        "color": "#F1948A"  # red
+    }
+}
 
-# Display progress bar
-progress = (st.session_state.current_stage + 1) / len(stages)
-st.progress(progress)
+# Display each department as a colored section with progress bars
+for dept, data in departments.items():
+    st.subheader(dept)
+    steps = data["steps"]
+    color = data["color"]
+    
+    for i, step in enumerate(steps):
+        progress = (i + 1) / len(steps)
+        st.markdown(f"**{step}**")
+        st.progress(progress)
 
-# Show all stages in a visual column layout
-st.subheader("Project Workflow by Department:")
-
-# Create columns for each department
-departments = ["Customer Success", "Technical Services", "Operations", "Quality"]
-cols = st.columns(len(departments))
-
-for i, dept in enumerate(departments):
-    with cols[i]:
-        st.markdown(f"### {dept}")
-        for idx, s in enumerate(stages):
-            if dept in s["department"]:
-                # Highlight current stage
-                if idx == st.session_state.current_stage:
-                    st.markdown(f"<div style='background-color:{s['color']};padding:5px;border-radius:5px'><b>✅ {s['stage']}</b></div>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"<div style='background-color:{s['color']};padding:5px;border-radius:5px'>{s['stage']}</div>", unsafe_allow_html=True)
+# Footer
+st.markdown("---")
+st.markdown("Generated with Streamlit 🚀")
